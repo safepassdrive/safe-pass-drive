@@ -105,7 +105,9 @@
             <div class="profile-section">
                 {% if profile_pic %}
                 <div class="profile-image">
-                    <img src="{{ url_for('view_document', unique_id=unique_id, filename=profile_pic) }}" alt="Profile Picture">
+                    <img src="{{ url_for('view_document', unique_id=unique_id, filename=profile_pic) }}" 
+                        alt="Profile Picture"
+                        onerror="this.onerror=null;this.src='{{ url_for('static', filename='images/default-profile.png') }}'">
                 </div>
                 {% else %}
                 <div class="profile-image">
