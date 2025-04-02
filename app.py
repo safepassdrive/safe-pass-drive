@@ -405,6 +405,11 @@ def view_document(unique_id, filename):
         # Get contact info from database
         contact = EmergencyContact.query.filter_by(unique_id=unique_id).first_or_404()
         
+        if filename.startswith('profile_picture_'):
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            if os.path.exists(file_path):
+                return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+        
         # Check if the document belongs to this contact
         try:
             import json
@@ -505,11 +510,8 @@ def authorize(unique_id):
     puc_doc = documents.get('puc_certificate')
     aadhaar_doc = documents.get('aadhaar_card')
     
-    # Debug print individual documents
-    print(f"License doc: {license_doc}")
-    print(f"Insurance doc: {insurance_doc}")
-    print(f"PUC doc: {puc_doc}")
-    print(f"Aadhaar doc: {aadhaar_doc}")
+    print(f"Profile pic path: {documents.get('profile_picture')}")  # Debug
+    print(f"Full profile pic URL: {url_for('view_document', unique_id=unique_id, filename=documents.get('profile_picture'), _external=True)}")
 
     return render_template('authorize.html',
                          unique_id=unique_id,
