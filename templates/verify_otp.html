@@ -1,0 +1,28 @@
+<!doctype html>
+<html>
+<head>
+    <title>Verify OTP</title>
+</head>
+<body>
+        <!-- Navbar -->
+        <nav class="bg-gray-800 shadow-lg">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between h-20 items-center">
+                    <div class="flex items-center space-x-3">
+                        <img src="static/images/logo.png" alt="Logo" class="w-16 h-16">
+                        <span class="font-bold text-xl text-white">SafePass Drive</span>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        
+    <h1>Verify OTP</h1>
+    <form method="post" action="{{ url_for('main.verify_otp') }}">
+        <input type="hidden" name="user_id" value="{{ user_id }}">
+        <label for="otp">OTP:</label>
+        <input type="text" id="otp" name="otp" required>
+        <br>
+        <button type="submit">Verify OTP</button>
+    </form>
+</body>
+</html>

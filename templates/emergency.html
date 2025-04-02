@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emergency Information</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/emergency-styles.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-content">
+            <a href="#" class="navbar-brand">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" class="w-12 h-12">
+                SafePass Drive
+            </a>
+        </div>
+    </nav>
+    <div class="main-container">
+        <div class="emergency-card">
+            <div class="alert-banner">
+                <i class="bi bi-exclamation-triangle-fill alert-icon"></i>
+                <div>
+                    <h2>Emergency Information</h2>
+                    <p>This information is meant for emergency purposes only.</p>
+                </div>
+            </div>
+
+            {% if contact_data %}
+            <div class="profile-section">
+                <div class="profile-image">
+                    {% if profile_pic %}
+                    <img src="{{ url_for('uploaded_file', filename=profile_pic) }}" alt="Profile Picture">
+                    {% else %}
+                    <div class="initial-circle">
+                        <span>{{ name[0] | upper }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <h3 class="profile-name">{{ name }}</h3>
+                
+               <!-- This is just the template section that needs fixing -->
+                <div class="details-list">
+                    <div class="detail-item">
+                        <div class="detail-label">
+                            <i class="bi bi-droplet-fill blood-icon"></i>
+                            <span>Blood Group</span>
+                        </div>
+                        <!-- Fix: Ensure this displays blood_group value, not gender -->
+                        <div class="detail-value blood-type">{{ blood_group if blood_group else 'Not specified' }}</div>
+                    </div>
+                    
+                    <div class="detail-item">
+                        <div class="detail-label">
+                            <i class="bi bi-gender-ambiguous"></i>
+                            <span>Gender</span>
+                        </div>
+                        <div class="detail-value">{{ gender }}</div>
+                    </div>
+                    
+                    <div class="detail-item">
+                        <div class="detail-label">
+                            <i class="bi bi-telephone-fill"></i>
+                            <span>Contact</span>
+                        </div>
+                        <div class="detail-value">{{ contact }}</div>
+                    </div>
+                </div>
+
+            <div class="emergency-actions">
+                <button class="location-btn" id="sendLocationBtn">
+                    <i class="bi bi-geo-alt-fill"></i>
+                    <span>Share Current Location</span>
+                </button>
+                
+                <a href="tel:{{ contact }}" class="call-btn">
+                    <i class="bi bi-telephone-fill"></i>
+                    <span>Call Emergency Contact</span>
+                </a>
+            </div>
+            {% else %}
+            <div class="no-data-message">
+                <i class="bi bi-exclamation-circle"></i>
+                <h4>No emergency information available</h4>
+                <p>Please contact your administrator to set up your emergency information.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('sendLocationBtn').addEventListener('click', function() {
+            const button = this;
+            button.disabled = true;
+            button.classList.add('loading');
+            button.innerHTML = '<i class="bi bi-hourglass-split"></i><span>Getting Location...</span>';
+            
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    var latitude = position.coords.latitude;
+                    var longitude = position.coords.longitude;
+                    
+                    button.innerHTML = '<i class="bi bi-arrow-repeat spin"></i><span>Preparing Share...</span>';
+                    
+                    // Get the contact number from the page
+                    const contactNumber = '{{ contact }}';
+                    
+                    // Construct the WhatsApp URL with location
+                    const locationMessage = `Emergency: I'm sharing my current location: https://www.google.com/maps?q=${latitude},${longitude}`;
+                    const whatsappURL = `https://wa.me/${contactNumber.replace(/\D/g, '')}?text=${encodeURIComponent(locationMessage)}`;
+                    
+                    // First send the location data to your server for records
+                    fetch('/send_location', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            unique_id: '{{ unique_id }}',
+                            latitude: latitude,
+                            longitude: longitude
+                        }),
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        showNotification('Location ready to share');
+                        
+                        // Open WhatsApp with the location
+                        window.open(whatsappURL, '_blank');
+                        
+                        // Reset button
+                        button.disabled = false;
+                        button.classList.remove('loading');
+                        button.innerHTML = '<i class="bi bi-geo-alt-fill"></i><span>Share Current Location</span>';
+                    })
+                    .catch((error) => {
+                        console.error('Error:', error);
+                        showNotification('Failed to prepare location share', 'error');
+                        
+                        // Reset button
+                        button.disabled = false;
+                        button.classList.remove('loading');
+                        button.innerHTML = '<i class="bi bi-geo-alt-fill"></i><span>Share Current Location</span>';
+                    });
+                }, function(error) {
+                    console.error('Geolocation error:', error);
+                    showNotification('Unable to retrieve your location', 'error');
+                    
+                    // Reset button
+                    button.disabled = false;
+                    button.classList.remove('loading');
+                    button.innerHTML = '<i class="bi bi-geo-alt-fill"></i><span>Share Current Location</span>';
+                });
+            } else {
+                showNotification('Geolocation is not supported by your browser', 'error');
+                button.disabled = false;
+                button.classList.remove('loading');
+                button.innerHTML = '<i class="bi bi-geo-alt-fill"></i><span>Share Current Location</span>';
+            }
+        });
+    
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <div class="notification-icon">
+                    <i class="bi ${type === 'success' ? 'bi-check-circle-fill' : 'bi-exclamation-circle-fill'}"></i>
+                </div>
+                <div class="notification-message">${message}</div>
+            `;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 10);
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
