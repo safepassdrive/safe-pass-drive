@@ -883,6 +883,14 @@ def prefetch_documents(contact_id):
     # Just verify access - no response needed
     return '', 204
 
+@app.route('/test-static')
+def test_static():
+    # This will help verify if static files are being served correctly
+    return f"""
+    Static folder: {app.static_folder}<br>
+    Logo exists: {os.path.exists(os.path.join(app.static_folder, 'images/logo.png'))}<br>
+    Logo URL: {url_for('static', filename='images/logo.png')}
+    """
 
 
 with app.app_context():
