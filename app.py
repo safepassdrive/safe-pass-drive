@@ -399,6 +399,30 @@ def create_police():
 def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
+@app.route('/view-document/<unique_id>/<filename>')
+def view_document(unique_id, filename):
+    try:
+        # Get contact info from database
+        contact = EmergencyContact.query.filter_by(unique_id=unique_id).first_or_404()
+        
+        # Check if the document belongs to this contact
+        try:
+            import json
+            data = json.loads(contact.additional_data)
+            documents = data.get('documents', {})
+            
+            # Check if the requested filename exists in the contact's documents
+            if filename not in documents.values():
+                return jsonify({'success': False, 'message': 'Document not found'}), 404
+                
+            return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+            
+        except json.JSONDecodeError:
+            return jsonify({'success': False, 'message': 'Invalid contact data format'}), 500
+            
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
 @app.route('/upload', methods=['POST'])
 @user_login_required 
 def upload_file():
@@ -437,7 +461,6 @@ def scan_result(unique_id):
 def authorize(unique_id):
     contact = EmergencyContact.query.filter_by(unique_id=unique_id).first_or_404()
     
-    
     contact_data = {
         'personal': {},
         'vehicle': {},
@@ -452,12 +475,10 @@ def authorize(unique_id):
     except Exception as e:
         print(f"Error parsing contact data: {str(e)}")
 
-
     personal = contact_data.get('personal', {})
     vehicle = contact_data.get('vehicle', {})
     license_info = contact_data.get('license', {})
     documents = contact_data.get('documents', {})
-
     
     license_doc = documents.get('driving_license') 
     insurance_doc = documents.get('insurance_policy')  
@@ -465,6 +486,7 @@ def authorize(unique_id):
     aadhaar_doc = documents.get('aadhaar_card')
 
     return render_template('authorize.html',
+                         unique_id=unique_id,
                          name=personal.get('name', contact.name),
                          contact=personal.get('mobile', contact.contact),
                          email=personal.get('email', ''),
@@ -764,19 +786,29 @@ def send_otp(unique_id):
             email = data.get('personal', {}).get('email')
             
             if not email:
-                return jsonify({'success': False, 'message': 'Email not found'}), 400
+                return jsonify({'success': False, 'message': 'Email not found in contact data'}), 400
+            
+            # Check if email configuration is set up
+            if not app.config['MAIL_PASSWORD']:
+                return jsonify({'success': False, 'message': 'Email configuration is not set up. Please check EMAIL_PASSWORD environment variable.'}), 500
             
             otp = generate_otp()
             otp_store[unique_id] = otp
             
             # Send email
-            msg = Message('Document Access OTP',
-                         sender=app.config['MAIL_USERNAME'],
-                         recipients=[email])
-            msg.body = f'Your OTP for accessing documents is: {otp}\nThis OTP will expire in 3 minutes.'
-            mail.send(msg)
-            
-            return jsonify({'success': True, 'message': 'OTP sent successfully'})
+            try:
+                msg = Message('Document Access OTP',
+                             sender=app.config['MAIL_USERNAME'],
+                             recipients=[email])
+                msg.body = f'Your OTP for accessing documents is: {otp}\nThis OTP will expire in 3 minutes.'
+                mail.send(msg)
+                return jsonify({'success': True, 'message': 'OTP sent successfully'})
+            except Exception as e:
+                print(f"Email sending error: {str(e)}")  # Log the error
+                return jsonify({'success': False, 'message': f'Failed to send email: {str(e)}'}), 500
+                
+        except json.JSONDecodeError:
+            return jsonify({'success': False, 'message': 'Invalid contact data format'}), 500
         except Exception as e:
             return jsonify({'success': False, 'message': f'Error processing contact data: {str(e)}'}), 500
             

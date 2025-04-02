@@ -196,77 +196,76 @@
         </div>
     
         <!-- Documents Section -->
-<!-- Documents Section -->
-<div class="info-section">
-    <div class="section-header">
-        <i class="bi bi-file-earmark-text-fill"></i>
-        <h2>Documents</h2>
-    </div>
-    
-    <!-- Documents Grid (Hidden by default) -->
-    <div id="documents-grid" class="document-grid" style="display: none;">
-        <a href="{{ url_for('uploaded_file', filename=license_doc) }}" target="_blank" class="document-link">
-            <div class="document-item">
-                <div class="document-icon">
-                    <i class="bi bi-person-badge"></i>
-                </div>
-                <div class="document-name">License</div>
+        <div class="info-section">
+            <div class="section-header">
+                <i class="bi bi-file-earmark-text-fill"></i>
+                <h2>Documents</h2>
             </div>
-        </a>
+            
+            <!-- Documents Grid (Hidden by default) -->
+            <div id="documents-grid" class="document-grid" style="display: none;">
+                <a href="{{ url_for('view_document', unique_id=unique_id, filename=license_doc) }}" target="_blank" class="document-link">
+                    <div class="document-item">
+                        <div class="document-icon">
+                            <i class="bi bi-person-badge"></i>
+                        </div>
+                        <div class="document-name">License</div>
+                    </div>
+                </a>
 
-        <a href="{{ url_for('uploaded_file', filename=insurance_doc) }}" target="_blank" class="document-link">
-            <div class="document-item">
-                <div class="document-icon">
-                    <i class="bi bi-shield-check"></i>
-                </div>
-                <div class="document-name">Insurance</div>
+                <a href="{{ url_for('view_document', unique_id=unique_id, filename=insurance_doc) }}" target="_blank" class="document-link">
+                    <div class="document-item">
+                        <div class="document-icon">
+                            <i class="bi bi-shield-check"></i>
+                        </div>
+                        <div class="document-name">Insurance</div>
+                    </div>
+                </a>
+
+                <a href="{{ url_for('view_document', unique_id=unique_id, filename=puc_doc) }}" target="_blank" class="document-link">
+                    <div class="document-item">
+                        <div class="document-icon">
+                            <i class="bi bi-file-earmark-check"></i>
+                        </div>
+                        <div class="document-name">PUC Certificate</div>
+                    </div>
+                </a>
+
+                <a href="{{ url_for('view_document', unique_id=unique_id, filename=aadhaar_doc) }}" target="_blank" class="document-link">
+                    <div class="document-item">
+                        <div class="document-icon">
+                            <i class="bi bi-file-earmark-check"></i>
+                        </div>
+                        <div class="document-name">Aadhar Card</div>
+                    </div>
+                </a>
             </div>
-        </a>
 
-        <a href="{{ url_for('uploaded_file', filename=puc_doc) }}" target="_blank" class="document-link">
-            <div class="document-item">
-                <div class="document-icon">
-                    <i class="bi bi-file-earmark-check"></i>
-                </div>
-                <div class="document-name">PUC Certificate</div>
+            <!-- Initial View - OTP Request Button -->
+            <div id="documents-locked" class="document-grid">
+                <button class="action-button primary-action" id="requestOtpBtn" onclick="requestOTP()">
+                    <i class="bi bi-shield-lock"></i>
+                    <span>Click to Get OTP</span>
+                </button>
             </div>
-        </a>
 
-        <a href="{{ url_for('uploaded_file', filename=aadhaar_doc) }}" target="_blank" class="document-link">
-            <div class="document-item">
-                <div class="document-icon">
-                    <i class="bi bi-file-earmark-check"></i>
+            <!-- OTP Verification Form (Hidden by default) -->
+            <div id="otp-verification" class="verification-section" style="display: none;">
+                <div class="otp-form">
+                    <p>OTP has been sent to {{ email }}</p>
+                    <input type="text" id="otpInput" placeholder="Enter OTP" maxlength="6" class="otp-input">
+                    <button class="action-button primary-action" onclick="verifyOTP()">
+                        <i class="bi bi-check-circle"></i>
+                        <span>Verify OTP</span>
+                    </button>
+                    <p id="otp-timer" class="timer-text"></p>
+                    <button class="action-button secondary-action" id="resendOtpBtn" onclick="requestOTP()" style="display: none;">
+                        <i class="bi bi-arrow-repeat"></i>
+                        <span>Resend OTP</span>
+                    </button>
                 </div>
-                <div class="document-name">Aadhar Card</div>
             </div>
-        </a>
-    </div>
-
-    <!-- Initial View - OTP Request Button -->
-    <div id="documents-locked" class="document-grid">
-        <button class="action-button primary-action" id="requestOtpBtn" onclick="requestOTP()">
-            <i class="bi bi-shield-lock"></i>
-            <span>Click to Get OTP</span>
-        </button>
-    </div>
-
-    <!-- OTP Verification Form (Hidden by default) -->
-    <div id="otp-verification" class="verification-section" style="display: none;">
-        <div class="otp-form">
-            <p>OTP has been sent to {{ email }}</p>
-            <input type="text" id="otpInput" placeholder="Enter OTP" maxlength="6" class="otp-input">
-            <button class="action-button primary-action" onclick="verifyOTP()">
-                <i class="bi bi-check-circle"></i>
-                <span>Verify OTP</span>
-            </button>
-            <p id="otp-timer" class="timer-text"></p>
-            <button class="action-button secondary-action" id="resendOtpBtn" onclick="requestOTP()" style="display: none;">
-                <i class="bi bi-arrow-repeat"></i>
-                <span>Resend OTP</span>
-            </button>
         </div>
-    </div>
-</div>
 
         <!-- Emergency Actions -->
         <div class="emergency-actions">
