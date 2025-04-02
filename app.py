@@ -411,16 +411,31 @@ def view_document(unique_id, filename):
             data = json.loads(contact.additional_data)
             documents = data.get('documents', {})
             
+            # Debug print
+            print(f"Requested filename: {filename}")
+            print(f"Available documents: {documents}")
+            
             # Check if the requested filename exists in the contact's documents
             if filename not in documents.values():
+                print(f"Document not found in contact's documents")
                 return jsonify({'success': False, 'message': 'Document not found'}), 404
+            
+            # Get the full file path
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            
+            # Check if file exists
+            if not os.path.exists(file_path):
+                print(f"File not found at path: {file_path}")
+                return jsonify({'success': False, 'message': 'File not found on server'}), 404
                 
             return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
             
-        except json.JSONDecodeError:
+        except json.JSONDecodeError as e:
+            print(f"JSON decode error: {str(e)}")
             return jsonify({'success': False, 'message': 'Invalid contact data format'}), 500
             
     except Exception as e:
+        print(f"Error in view_document: {str(e)}")
         return jsonify({'success': False, 'message': str(e)}), 500
 
 @app.route('/upload', methods=['POST'])
@@ -472,6 +487,7 @@ def authorize(unique_id):
         if contact.additional_data:
             import json
             contact_data = json.loads(contact.additional_data)
+            print(f"Contact data loaded: {contact_data}")  # Debug print
     except Exception as e:
         print(f"Error parsing contact data: {str(e)}")
 
@@ -480,10 +496,20 @@ def authorize(unique_id):
     license_info = contact_data.get('license', {})
     documents = contact_data.get('documents', {})
     
-    license_doc = documents.get('driving_license') 
-    insurance_doc = documents.get('insurance_policy')  
-    puc_doc = documents.get('puc_certificate') 
+    # Debug print document paths
+    print(f"Document paths: {documents}")
+    
+    # Get document paths, ensuring we're using the correct keys
+    license_doc = documents.get('driving_license')
+    insurance_doc = documents.get('insurance_policy')
+    puc_doc = documents.get('puc_certificate')
     aadhaar_doc = documents.get('aadhaar_card')
+    
+    # Debug print individual documents
+    print(f"License doc: {license_doc}")
+    print(f"Insurance doc: {insurance_doc}")
+    print(f"PUC doc: {puc_doc}")
+    print(f"Aadhaar doc: {aadhaar_doc}")
 
     return render_template('authorize.html',
                          unique_id=unique_id,
@@ -554,7 +580,9 @@ def options_page(user_id):
 def generate_qr():
     if request.method == 'POST':
         try:
-
+            # Create uploads directory if it doesn't exist
+            Path(app.config['UPLOAD_FOLDER']).mkdir(parents=True, exist_ok=True)
+            
             name = request.form.get('full_name')
             dob = request.form.get('date_of_birth')
             gender = request.form.get('gender')
@@ -610,6 +638,7 @@ def generate_qr():
                 filename = f"{doc_name}_{uuid.uuid4()}_{secure_filename(file.filename)}"
                 file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
                 file.save(file_path)
+                print(f"Saved file: {filename} to {file_path}")  # Debug print
                 document_paths[doc_name] = filename
             
             # Process optional documents
@@ -620,6 +649,7 @@ def generate_qr():
                         filename = f"{doc_name}_{uuid.uuid4()}_{secure_filename(file.filename)}"
                         file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
                         file.save(file_path)
+                        print(f"Saved optional file: {filename} to {file_path}")  # Debug print
                         document_paths[doc_name] = filename
             
             # Create JSON data for all fields
@@ -651,6 +681,8 @@ def generate_qr():
                 },
                 "documents": document_paths
             }
+            
+            print(f"Document paths being saved: {document_paths}")  # Debug print
             
             # Generate unique ID for the emergency contact
             unique_id = str(uuid.uuid4())

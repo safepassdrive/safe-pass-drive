@@ -204,6 +204,7 @@
             
             <!-- Documents Grid (Hidden by default) -->
             <div id="documents-grid" class="document-grid" style="display: none;">
+                {% if license_doc %}
                 <a href="{{ url_for('view_document', unique_id=unique_id, filename=license_doc) }}" target="_blank" class="document-link">
                     <div class="document-item">
                         <div class="document-icon">
@@ -212,7 +213,9 @@
                         <div class="document-name">License</div>
                     </div>
                 </a>
+                {% endif %}
 
+                {% if insurance_doc %}
                 <a href="{{ url_for('view_document', unique_id=unique_id, filename=insurance_doc) }}" target="_blank" class="document-link">
                     <div class="document-item">
                         <div class="document-icon">
@@ -221,7 +224,9 @@
                         <div class="document-name">Insurance</div>
                     </div>
                 </a>
+                {% endif %}
 
+                {% if puc_doc %}
                 <a href="{{ url_for('view_document', unique_id=unique_id, filename=puc_doc) }}" target="_blank" class="document-link">
                     <div class="document-item">
                         <div class="document-icon">
@@ -230,7 +235,9 @@
                         <div class="document-name">PUC Certificate</div>
                     </div>
                 </a>
+                {% endif %}
 
+                {% if aadhaar_doc %}
                 <a href="{{ url_for('view_document', unique_id=unique_id, filename=aadhaar_doc) }}" target="_blank" class="document-link">
                     <div class="document-item">
                         <div class="document-icon">
@@ -239,6 +246,7 @@
                         <div class="document-name">Aadhar Card</div>
                     </div>
                 </a>
+                {% endif %}
             </div>
 
             <!-- Initial View - OTP Request Button -->
