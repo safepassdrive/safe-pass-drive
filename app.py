@@ -17,9 +17,17 @@ import random
 import string
 from models import db, User, EmergencyContact, Admin, Police
 from sqlalchemy import inspect
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 
 app = Flask(__name__, static_url_path='/static')
+
+app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1)
+# Force HTTPS
+@app.before_request
+def force_https():
+    if not request.is_secure and request.headers.get('X-Forwarded-Proto', 'http') == 'http':
+        return redirect(request.url.replace('http://', 'https://', 1), code=301)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///local.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
