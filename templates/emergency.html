@@ -31,7 +31,7 @@
             <div class="profile-section">
                 <div class="profile-image">
                     {% if profile_pic %}
-                    <img src="{{ url_for('uploaded_file', filename=profile_pic) }}" alt="Profile Picture">
+                    <img src="{{ url_for('view_document', unique_id=unique_id, filename=profile_pic) }}" alt="Profile Picture">
                     {% else %}
                     <div class="initial-circle">
                         <span>{{ name[0] | upper }}</span>
