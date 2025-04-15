@@ -532,13 +532,12 @@
             position: relative;
             width: 100%;
             max-width: 320px;
-            margin: 0.5rem 0;
         }
-        
+
         .password-toggle {
             position: absolute;
-            right: 12px;
-            top: 50%;
+            left: 8rem;
+            top: 35%;
             transform: translateY(-50%);
             background: none;
             border: none;
@@ -547,11 +546,10 @@
             padding: 0;
             font-size: 1rem;
         }
-        
+
         .password-toggle:hover {
             color: #f9fafb;
         }
-        
     </style>
 </head>
 <body>
@@ -561,7 +559,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-20 items-center">
             <div class="flex items-center space-x-3">
-                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" class="w-16 h-16">
+                <img src="static/images/logo.png" alt="Logo" class="w-16 h-16">
                 <span class="font-bold text-xl text-white">SafePass Drive</span>
             </div>
             
@@ -604,7 +602,7 @@
                 <input type="email" id="login-email" name="email" placeholder="Email" required>
                 <div class="password-container">
                     <input type="password" id="login-password" name="password" placeholder="Password" required>
-                    <button type="button" class="password-toggle" onclick="togglePassword('login-password', this)">
+                    <button type="button" class="password-toggle" onclick="togglePassword('login-password')">
                         <i class="fas fa-eye"></i>
                     </button>
                 </div>
@@ -620,13 +618,13 @@
                 <input type="email" id="signup-email" name="email" placeholder="Email" required>
                 <div class="password-container">
                     <input type="password" id="signup-password" name="password" placeholder="Password" pattern=".{8,}" title="Password must be at least 8 characters" required>
-                    <button type="button" class="password-toggle" onclick="togglePassword('signup-password', this)">
+                    <button type="button" class="password-toggle" onclick="togglePassword('signup-password')">
                         <i class="fas fa-eye"></i>
                     </button>
                 </div>
                 <div class="password-container">
                     <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm Password" pattern=".{8,}" title="Password must be at least 8 characters" required>
-                    <button type="button" class="password-toggle" onclick="togglePassword('confirm_password', this)">
+                    <button type="button" class="password-toggle" onclick="togglePassword('confirm_password')">
                         <i class="fas fa-eye"></i>
                     </button>
                 </div>
@@ -657,15 +655,10 @@
                     <input type="text" maxlength="1" name="otp5" pattern="[0-9]" inputmode="numeric" required>
                     <input type="text" maxlength="1" name="otp6" pattern="[0-9]" inputmode="numeric" required>
                 </div>
-                <div class="password-container">
-                    <input type="password" id="new-password" name="new_password" placeholder="New Password" required>
-                    <button type="button" class="password-toggle" onclick="togglePassword('new-password', this)">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                </div>
+                <input type="password" id="new-password" name="new_password" placeholder="New Password" required>
                 <div class="password-container">
                     <input type="password" id="confirm-new-password" name="confirm_new_password" placeholder="Confirm New Password" required>
-                    <button type="button" class="password-toggle" onclick="togglePassword('confirm-new-password', this)">
+                    <button type="button" class="password-toggle" onclick="togglePassword('confirm-new-password')">
                         <i class="fas fa-eye"></i>
                     </button>
                 </div>
@@ -884,6 +877,20 @@
             }, 3000);
         }
 
+        function togglePassword(inputId) {
+            const passwordInput = document.getElementById(inputId);
+            const toggleButton = passwordInput.nextElementSibling.querySelector('i');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleButton.classList.remove('fa-eye');
+                toggleButton.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                toggleButton.classList.remove('fa-eye-slash');
+                toggleButton.classList.add('fa-eye');
+            }
+        }
 
         // Mobile menu functionality
 const hamburgerBtn = document.querySelector('.hamburger-btn');
@@ -915,21 +922,6 @@ if (hamburgerBtn && mobileMenuContainer) {
         }
     });
 }
-
-    function togglePassword(inputId, button) {
-        const input = document.getElementById(inputId);
-        const icon = button.querySelector('i');
-        
-        if (input.type === 'password') {
-            input.type = 'text';
-            icon.classList.remove('fa-eye');
-            icon.classList.add('fa-eye-slash');
-        } else {
-            input.type = 'password';
-            icon.classList.remove('fa-eye-slash');
-            icon.classList.add('fa-eye');
-        }
-    }
     </script>
 </body>
 </html>
