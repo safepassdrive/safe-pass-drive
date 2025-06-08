@@ -7,233 +7,519 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .glow-button {
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .nav-link {
+            transition: all 0.3s ease;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: white;
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.success {
+            background-color: #10b981;
+        }
+        
+        .notification.error {
+            background-color: #ef4444;
+        }
+        
+        /* Mobile menu toggle */
+        .mobile-menu {
+            display: none;
+        }
+        
+        .mobile-menu.active {
+            display: block;
+        }
+        
+        /* Mobile card layout for table data */
+        .mobile-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 16px;
+        }
+        
+        .mobile-card-header {
+            background: #f8f9fa;
+            padding: 16px;
+            border-bottom: 1px solid #e5e7eb;
+            border-radius: 8px 8px 0 0;
+        }
+        
+        .mobile-card-body {
+            padding: 16px;
+        }
+        
+        .mobile-card-section {
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        
+        .mobile-card-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .mobile-card-label {
+            font-weight: 600;
+            color: #374151;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+        
+        .mobile-card-value {
+            color: #6b7280;
+            font-size: 14px;
+        }
+        
+        /* Responsive utilities */
+        @media (max-width: 768px) {
+            .desktop-table {
+                display: none;
+            }
+            
+            .mobile-cards {
+                display: block;
+            }
+            
+            .nav-desktop {
+                display: none;
+            }
+            
+            .nav-mobile {
+                display: block;
+            }
+        }
+        
+        @media (min-width: 769px) {
+            .desktop-table {
+                display: block;
+            }
+            
+            .mobile-cards {
+                display: none;
+            }
+            
+            .nav-desktop {
+                display: flex;
+            }
+            
+            .nav-mobile {
+                display: none;
+            }
+        }
+        
+        /* Improved button styles for mobile */
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .action-button {
+            flex: 1;
+            min-width: 80px;
+            text-align: center;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        
+        .document-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .document-item {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        
+        .document-item:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
 
-
-<body>
-
-        <!-- Navbar - Same as landing page -->
-        <nav class="bg-gray-800 shadow-lg">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex justify-between h-20 items-center">
-                    <div class="flex items-center space-x-3">
-                        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" class="w-16 h-16">
-                        <span class="font-bold text-xl text-white">SafePass Drive</span>
+<body class="bg-gray-50">
+    <!-- Navbar -->
+    <nav class="bg-gray-800 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 md:h-20 items-center">
+                <!-- Logo -->
+                <div class="flex items-center space-x-2 md:space-x-3">
+                    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" class="w-10 h-10 md:w-16 md:h-16">
+                    <span class="font-bold text-lg md:text-xl text-white">SafePass Drive</span>
+                </div>
+                
+                <!-- Desktop Navigation -->
+                <div class="nav-desktop items-center space-x-8">
+                    <div class="flex items-center space-x-8 mr-4">
+                        <a href="{{ url_for('admin_login') }}" class="nav-link text-gray-300 hover:text-white">Admin Login</a>
+                        <a href="#features" class="nav-link text-gray-300 hover:text-white">Features</a>
+                        <a href="#how-it-works" class="nav-link text-gray-300 hover:text-white">How It Works</a>
+                        <a href="#use-cases" class="nav-link text-gray-300 hover:text-white">Use Cases</a>
+                        <a href="{{ url_for('auth') }}" class="gradient-bg text-white px-5 py-2 rounded-full font-medium hover:opacity-90 transition glow-button">Get Started</a>
                     </div>
-                    <div class="flex items-center space-x-8">
-                        <div class="hidden md:flex items-center space-x-8 mr-4">
-                            <a href="{{ url_for('admin_login') }}" class="nav-link text-gray-300 hover:text-white">Admin Login</a>
-                            <a href="#features" class="nav-link text-gray-300 hover:text-white">Features</a>
-                            <a href="#how-it-works" class="nav-link text-gray-300 hover:text-white">How It Works</a>
-                            <a href="#use-cases" class="nav-link text-gray-300 hover:text-white">Use Cases</a>
-                            <a href="{{ url_for('auth') }}" class="gradient-bg text-white px-5 py-2 rounded-full font-medium hover:opacity-90 transition glow-button">Get Started</a>
-                        </div>
-                        <a href="{{ url_for('admin_logout') }}" class="text-gray-300 hover:text-white px-3 py-2 rounded-md border border-gray-600 hover:border-white transition duration-300 ease-in-out hover:bg-gray-700 flex items-center space-x-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                            </svg>
-                            LOGOUT
+                    <a href="{{ url_for('admin_logout') }}" class="text-gray-300 hover:text-white px-3 py-2 rounded-md border border-gray-600 hover:border-white transition duration-300 ease-in-out hover:bg-gray-700 flex items-center space-x-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                        </svg>
+                        LOGOUT
+                    </a>
+                </div>
+                
+                <!-- Mobile Navigation -->
+                <div class="nav-mobile">
+                    <div class="flex items-center space-x-4">
+                        <a href="{{ url_for('admin_logout') }}" class="text-gray-300 hover:text-white px-2 py-1 rounded border border-gray-600 text-sm">
+                            <i class="fas fa-sign-out-alt"></i> Logout
                         </a>
+                        <button onclick="toggleMobileMenu()" class="text-gray-300 hover:text-white">
+                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <!-- Mobile Menu Dropdown -->
+                    <div id="mobileMenu" class="mobile-menu absolute top-16 left-0 right-0 bg-gray-800 border-t border-gray-700 px-4 py-4 space-y-3">
+                        <a href="{{ url_for('admin_login') }}" class="block text-gray-300 hover:text-white py-2">Admin Login</a>
+                        <a href="#features" class="block text-gray-300 hover:text-white py-2">Features</a>
+                        <a href="#how-it-works" class="block text-gray-300 hover:text-white py-2">How It Works</a>
+                        <a href="#use-cases" class="block text-gray-300 hover:text-white py-2">Use Cases</a>
+                        <a href="{{ url_for('auth') }}" class="block gradient-bg text-white px-4 py-2 rounded font-medium text-center">Get Started</a>
                     </div>
                 </div>
             </div>
-        </nav>
+        </div>
+    </nav>
 
-
-
-<div class="container mx-auto px-4 py-8">
-    <h1 class="text-2xl font-bold mb-6">Admin Dashboard</h1>
-    
-    <div class="bg-white shadow rounded-lg p-6">
+    <div class="container mx-auto px-4 py-6 md:py-8">
+        <h1 class="text-xl md:text-2xl font-bold mb-4 md:mb-6">Admin Dashboard</h1>
         
-        {% if pending_contacts %}
-            <div class="overflow-x-auto">
-                <table class="min-w-full table-auto">
-                    <thead>
-                        <tr>
-                            <th class="px-4 py-2">Name</th>
-                            <th class="px-4 py-2">Contact</th>
-                            <th class="px-4 py-2">Documents</th>
-                            <th class="px-4 py-2">Created At</th>
-                            <th class="px-4 py-2">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for contact in pending_contacts %}
-                            <tr>
-                                <td class="border px-4 py-2">{{ contact.name }}</td>
-                                <td class="border px-4 py-2">{{ contact.contact }}</td>
-                                <td class="border px-4 py-2">
-                                    <!-- Primary document link -->
-                                    <a href="{{ url_for('download_file', filename=contact.document_path) }}" 
-                                       class="text-blue-600 hover:text-blue-800 mb-1 block">
-                                        Primary Document
-                                    </a>
-                                    
-                                    {% if contact.additional_data %}
-                                    <button onclick="toggleDocuments('{{ contact.id }}')"
-                                            class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm hover:bg-blue-200 transition-colors">
-                                        View All Documents
-                                    </button>
-                                    
-                                    <div id="documents-{{ contact.id }}" class="hidden mt-2 bg-gray-50 p-2 rounded">
-                                        {% set documents = contact.additional_data|get_documents_from_json %}
-                                        {% if documents %}
-                                            {% for doc_name, filename in documents.items() %}
-                                                <div class="flex items-center justify-between py-1">
-                                                    <span class="text-sm text-gray-700">
-                                                        {{ doc_name.replace('_', ' ').title() }}
-                                                    </span>
-                                                    <a href="{{ url_for('uploaded_file', filename=filename) }}" 
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    class="ml-4 text-blue-600 hover:text-blue-800 text-sm underline">
-                                                        View
-                                                    </a>
+        <div class="bg-white shadow rounded-lg p-4 md:p-6">
+            {% if pending_contacts %}
+                <!-- Desktop Table View -->
+                <div class="desktop-table overflow-x-auto">
+                    <table class="min-w-full table-auto">
+                        <thead>
+                            <tr class="bg-gray-50">
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-900">Name</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-900">Contact</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-900">Documents</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-900">Created At</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-900">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            {% for contact in pending_contacts %}
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-4 py-3 text-sm">{{ contact.name }}</td>
+                                    <td class="px-4 py-3 text-sm">{{ contact.contact }}</td>
+                                    <td class="px-4 py-3 text-sm">
+                                        <a href="{{ url_for('download_file', filename=contact.document_path) }}" 
+                                           class="text-blue-600 hover:text-blue-800 mb-1 block text-sm">
+                                            Primary Document
+                                        </a>
+                                        
+                                        {% if contact.additional_data %}
+                                        <button onclick="toggleDocuments('{{ contact.id }}')"
+                                                class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs hover:bg-blue-200 transition-colors">
+                                            View All Documents
+                                        </button>
+                                        
+                                        <div id="documents-{{ contact.id }}" class="hidden mt-2 bg-gray-50 p-2 rounded">
+                                            {% set documents = contact.additional_data|get_documents_from_json %}
+                                            {% if documents %}
+                                                {% for doc_name, filename in documents.items() %}
+                                                    <div class="flex items-center justify-between py-1">
+                                                        <span class="text-xs text-gray-700">
+                                                            {{ doc_name.replace('_', ' ').title() }}
+                                                        </span>
+                                                        <a href="{{ url_for('uploaded_file', filename=filename) }}" 
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        class="ml-4 text-blue-600 hover:text-blue-800 text-xs underline">
+                                                            View
+                                                        </a>
+                                                    </div>
+                                                {% endfor %}
+                                            {% else %}
+                                                <p class="text-xs text-gray-500">No additional documents found</p>
+                                            {% endif %}
+                                        </div>
+                                    {% endif %}
+                                    </td>
+                                    <td class="px-4 py-3 text-sm text-gray-600">{{ contact.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                                    <td class="px-4 py-3">
+                                        <div class="flex space-x-2">
+                                            <a href="{{ url_for('approve_contact', contact_id=contact.id) }}" 
+                                               class="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600 transition-colors">
+                                                Approve
+                                            </a>
+                                            <form method="POST" action="{{ url_for('deny_contact', contact_id=contact.id) }}" style="display: inline;">
+                                                <button type="submit" 
+                                                       class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600 transition-colors">
+                                                    Deny
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Mobile Card View -->
+                <div class="mobile-cards space-y-4">
+                    {% for contact in pending_contacts %}
+                        <div class="mobile-card">
+                            <div class="mobile-card-header">
+                                <h3 class="font-semibold text-lg text-gray-900">{{ contact.name }}</h3>
+                                <p class="text-sm text-gray-600 mt-1">{{ contact.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+                            </div>
+                            
+                            <div class="mobile-card-body">
+                                <div class="mobile-card-section">
+                                    <div class="mobile-card-label">Contact Information</div>
+                                    <div class="mobile-card-value">{{ contact.contact }}</div>
+                                </div>
+                                
+                                <div class="mobile-card-section">
+                                    <div class="mobile-card-label">Documents</div>
+                                    <div class="space-y-2">
+                                        <a href="{{ url_for('download_file', filename=contact.document_path) }}" 
+                                           class="inline-block text-blue-600 hover:text-blue-800 text-sm underline">
+                                            📄 Primary Document
+                                        </a>
+                                        
+                                        {% if contact.additional_data %}
+                                            <div>
+                                                <button onclick="toggleDocuments('mobile-{{ contact.id }}')"
+                                                        class="bg-blue-100 text-blue-800 px-3 py-1 rounded text-sm hover:bg-blue-200 transition-colors w-full">
+                                                    📁 View All Documents
+                                                </button>
+                                                
+                                                <div id="documents-mobile-{{ contact.id }}" class="hidden mt-3 bg-gray-50 p-3 rounded document-list">
+                                                    {% set documents = contact.additional_data|get_documents_from_json %}
+                                                    {% if documents %}
+                                                        {% for doc_name, filename in documents.items() %}
+                                                            <div class="document-item">
+                                                                <span class="text-sm text-gray-700 flex-1">
+                                                                    {{ doc_name.replace('_', ' ').title() }}
+                                                                </span>
+                                                                <a href="{{ url_for('uploaded_file', filename=filename) }}" 
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                                                                    View →
+                                                                </a>
+                                                            </div>
+                                                        {% endfor %}
+                                                    {% else %}
+                                                        <p class="text-sm text-gray-500 text-center py-2">No additional documents found</p>
+                                                    {% endif %}
                                                 </div>
-                                            {% endfor %}
-                                        {% else %}
-                                            <p class="text-sm text-gray-500">No additional documents found</p>
+                                            </div>
                                         {% endif %}
                                     </div>
-                                {% endif %}
-                                </td>
-                                <td class="border px-4 py-2">{{ contact.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
-                                <td class="border px-4 py-2">
-                                    <a href="{{ url_for('approve_contact', contact_id=contact.id) }}" 
-                                       class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 mr-2">
-                                        Approve
-                                    </a>
-                                    <form method="POST" action="{{ url_for('deny_contact', contact_id=contact.id) }}" style="display: inline;">
-                                        <button type="submit" 
-                                           class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 mr-2">
-                                            Deny
-                                        </button>
-                                    </form>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        {% else %}
-            <p class="text-gray-600">No pending approvals</p>
-        {% endif %}
+                                </div>
+                                
+                                <div class="mobile-card-section">
+                                    <div class="mobile-card-label">Actions</div>
+                                    <div class="action-buttons">
+                                        <a href="{{ url_for('approve_contact', contact_id=contact.id) }}" 
+                                           class="action-button bg-green-500 text-white hover:bg-green-600">
+                                            ✓ Approve
+                                        </a>
+                                        <form method="POST" action="{{ url_for('deny_contact', contact_id=contact.id) }}" class="flex-1">
+                                            <button type="submit" 
+                                                   class="action-button bg-red-500 text-white hover:bg-red-600 w-full">
+                                                ✗ Deny
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-12">
+                    <div class="text-gray-400 text-6xl mb-4">
+                        <i class="fas fa-inbox"></i>
+                    </div>
+                    <p class="text-gray-600 text-lg">No pending approvals</p>
+                    <p class="text-gray-500 text-sm mt-2">New contact requests will appear here</p>
+                </div>
+            {% endif %}
+        </div>
     </div>
-</div>
 
-<!-- Deny Form Modal -->
-<div id="denyModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full">
-    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-        <form id="denyForm" method="POST" action="">
-            <h3 class="text-lg font-medium mb-4">Deny Contact</h3>
-            <textarea name="comment" class="w-full p-2 border rounded mb-4" 
-                      placeholder="Reason for denial (optional)"></textarea>
-            <div class="flex justify-end">
-                <button type="button" onclick="hideDenyForm()"
-                        class="bg-gray-500 text-white px-4 py-2 rounded mr-2">
-                    Cancel
-                </button>
-                <button type="submit" 
-                        class="bg-red-500 text-white px-4 py-2 rounded">
-                    Confirm Deny
-                </button>
-            </div>
-        </form>
+    <!-- Deny Form Modal -->
+    <div id="denyModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+        <div class="relative top-20 mx-auto p-5 border max-w-md w-11/12 shadow-lg rounded-md bg-white">
+            <form id="denyForm" method="POST" action="">
+                <h3 class="text-lg font-medium mb-4">Deny Contact</h3>
+                <textarea name="comment" class="w-full p-3 border rounded-md mb-4 resize-none" 
+                          rows="4"
+                          placeholder="Reason for denial (optional)"></textarea>
+                <div class="flex flex-col sm:flex-row gap-3 sm:justify-end">
+                    <button type="button" onclick="hideDenyForm()"
+                            class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 transition-colors">
+                        Cancel
+                    </button>
+                    <button type="submit" 
+                            class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition-colors">
+                        Confirm Deny
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Show any flash messages
-        if (flashed_messages.length > 0) {
-            for (let i = 0; i < flashed_messages.length; i++) {
-                showNotification(flashed_messages[i].message, flashed_messages[i].category);
+    <script>
+        // Initialize with flashed messages if they exist
+        const flashed_messages = {{ flashed_messages|default([])|tojson }};
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Show any flash messages
+            if (flashed_messages && flashed_messages.length > 0) {
+                for (let i = 0; i < flashed_messages.length; i++) {
+                    showNotification(flashed_messages[i].message, flashed_messages[i].category);
+                }
             }
-        }
 
-        // Add click handlers for all document links to prevent session loss
-        document.querySelectorAll('a[href*="uploaded_file"]').forEach(link => {
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                const url = this.getAttribute('href');
-                
-                // Open in new tab with proper authentication
-                const newWindow = window.open('', '_blank');
-                
-                // First verify admin session is still active
-                fetch('/admin/verify-session', {
-                    credentials: 'same-origin'
-                })
-                .then(response => {
-                    if (response.ok) {
-                        newWindow.location.href = url;
-                    } else {
-                        showNotification('Session expired. Please login again.', 'error');
-                        window.location.href = '/admin/login';
-                    }
-                })
-                .catch(error => {
-                    showNotification('Error verifying session', 'error');
-                    console.error('Error:', error);
+            // Add click handlers for all document links to prevent session loss
+            document.querySelectorAll('a[href*="uploaded_file"]').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const url = this.getAttribute('href');
+                    
+                    // Open in new tab with proper authentication
+                    const newWindow = window.open('', '_blank');
+                    
+                    // First verify admin session is still active
+                    fetch('/admin/verify-session', {
+                        credentials: 'same-origin'
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            newWindow.location.href = url;
+                        } else {
+                            showNotification('Session expired. Please login again.', 'error');
+                            window.location.href = '/admin/login';
+                        }
+                    })
+                    .catch(error => {
+                        showNotification('Error verifying session', 'error');
+                        console.error('Error:', error);
+                    });
                 });
             });
         });
-    });
-    
-    function showNotification(message, type = 'success') {
-        const notification = document.createElement('div');
-        notification.className = `notification ${type}`;
-        notification.innerHTML = `
-            <div class="notification-icon">
-                <i class="bi ${type === 'success' ? 'bi-check-circle-fill' : 'bi-exclamation-circle-fill'}"></i>
-            </div>
-            <div class="notification-message">${message}</div>
-        `;
-        document.body.appendChild(notification);
         
-        setTimeout(() => {
-            notification.classList.add('show');
-        }, 10);
-        
-        setTimeout(() => {
-            notification.classList.remove('show');
-            setTimeout(() => {
-                notification.remove();
-            }, 300);
-        }, 3000);
-    }
-    
-    function showDenyForm(contactId) {
-        const modal = document.getElementById('denyModal');
-        const form = document.getElementById('denyForm');
-        
-        console.log("Contact ID:", contactId);
-        form.action = `/admin/deny/${contactId}`;
-        form.method = "POST";
-        modal.classList.remove('hidden');
-    }
-    
-    function hideDenyForm() {
-        const modal = document.getElementById('denyModal');
-        modal.classList.add('hidden');
-    }
-    
-    function toggleDocuments(contactId) {
-        const documentsDiv = document.getElementById(`documents-${contactId}`);
-        documentsDiv.classList.toggle('hidden');
-        
-        // If showing, pre-fetch document URLs to maintain session
-        if (!documentsDiv.classList.contains('hidden')) {
-            fetch(`/admin/prefetch-documents/${contactId}`, {
-                credentials: 'same-origin'
-            }).catch(error => {
-                console.error('Prefetch error:', error);
-            });
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('active');
         }
-    }
-</script>
-
+        
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <div class="flex items-center">
+                    <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} mr-2"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 10);
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            }, 3000);
+        }
+        
+        function showDenyForm(contactId) {
+            const modal = document.getElementById('denyModal');
+            const form = document.getElementById('denyForm');
+            
+            console.log("Contact ID:", contactId);
+            form.action = `/admin/deny/${contactId}`;
+            form.method = "POST";
+            modal.classList.remove('hidden');
+        }
+        
+        function hideDenyForm() {
+            const modal = document.getElementById('denyModal');
+            modal.classList.add('hidden');
+        }
+        
+        function toggleDocuments(contactId) {
+            const documentsDiv = document.getElementById(`documents-${contactId}`);
+            documentsDiv.classList.toggle('hidden');
+            
+            // If showing, pre-fetch document URLs to maintain session
+            if (!documentsDiv.classList.contains('hidden')) {
+                fetch(`/admin/prefetch-documents/${contactId}`, {
+                    credentials: 'same-origin'
+                }).catch(error => {
+                    console.error('Prefetch error:', error);
+                });
+            }
+        }
+        
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const menu = document.getElementById('mobileMenu');
+            const menuButton = event.target.closest('button[onclick="toggleMobileMenu()"]');
+            
+            if (!menuButton && !menu.contains(event.target)) {
+                menu.classList.remove('active');
+            }
+        });
+    </script>
 </body>
 </html>
